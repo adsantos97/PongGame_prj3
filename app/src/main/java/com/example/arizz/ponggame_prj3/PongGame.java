@@ -29,7 +29,7 @@ public class PongGame {
         setHighestHits(pref.getInt(PREFERENCE_HITS, 0));
     }*/
 
-    public PongGame(Rect newPaddleRect, int newBallRadius,
+    /*public PongGame(Rect newPaddleRect, int newBallRadius,
                     float newPaddleSpeed, float newBallSpeed) {
         setPaddleRect(newPaddleRect);
         setPaddleSpeed(newPaddleSpeed);
@@ -37,6 +37,12 @@ public class PongGame {
         setBallSpeed(newBallSpeed);
         ballDropped = false;
         paddleHit = false;
+    }*/
+
+    public PongGame(int newBallRadius, float newBallSpeed) {
+        setBallRadius(newBallRadius);
+        setBallSpeed(newBallSpeed);
+        ballDropped = false;
     }
 
     /*public void setPreferenceHits(Context context) {
@@ -138,6 +144,12 @@ public class PongGame {
         ballCenter.y -= ballSpeed * Math.sin(ballAngle) * deltaTime;
     }
 
+    public void loadBall() {
+        ballDropped = false;
+        ballCenter.x = 0;
+        ballCenter.y = 0;
+    }
+
     /**
      * Used to check if the ball hits the sides of the screen
      * Checks right, left, and top
@@ -168,8 +180,17 @@ public class PongGame {
     /**
      * "Drops" ball
      */
-    public void dropBall() {
+    public void dropBall(float newBallAngle) {
         ballDropped = true;
+        if(newBallAngle >= 0 && newBallAngle <= Math.PI / 2) {
+            ballAngle = newBallAngle;
+        }
+        else if(newBallAngle < 0) {
+            ballAngle = 0;
+        }
+        else {
+            ballAngle = (float) Math.PI / 2;
+        }
     }
 
     public boolean isPaddleHit() {

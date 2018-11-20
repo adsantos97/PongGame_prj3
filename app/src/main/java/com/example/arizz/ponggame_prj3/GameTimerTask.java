@@ -12,7 +12,12 @@ public class GameTimerTask extends TimerTask {
     }
 
     public void run() {
-        game.moveBall();
+        if(game.ballOffScreen()) {
+            game.loadBall();
+        }
+        else if (game.isBallDropped()) {
+            game.moveBall();
+        }
         gameView.postInvalidate();
     }
 }

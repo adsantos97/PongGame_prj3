@@ -51,14 +51,14 @@ public class GameActivity extends Activity {
     }
 
     private class TouchHandler extends GestureDetector.SimpleOnGestureListener {
-        public boolean onDoubleTapEvent(MotionEvent event) {
+        /*public boolean onDoubleTapEvent(MotionEvent event) {
             updatePaddle(event);
             return true;
-        }
+        }*/
 
         public boolean onSingleTapConfirmed(MotionEvent event) {
             if(!game.isBallDropped()) {
-                game.dropBall();
+                game.dropBall(0);
             }
             return true;
         }

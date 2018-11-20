@@ -20,13 +20,17 @@ public class GameView extends View {
         this.width = width;
         this.height = height;
 
-        Rect paddleRect = new Rect(0, 0, width/7, height/16);
+       /*Rect paddleRect = new Rect(0, 0, width/7, height/16);
         game = new PongGame(paddleRect, 5, .03f, .2f);
         game.setPaddleSpeed(width * .00003f);
         game.setBallSpeed(width * .0003f);
         game.setDeltaTime(DELTA_TIME);
 
-        game.setPongRect(new Rect(0, 0, width, height));
+        game.setPongRect(new Rect(0, 0, width, height)); */
+
+        game = new PongGame(5, .2f);
+        game.setBallSpeed(width * .0003f);
+        game.setDeltaTime(DELTA_TIME);
 
         // define style and color for ball
         paint_ball = new Paint();
@@ -46,8 +50,14 @@ public class GameView extends View {
 
         // draw ball
         //canvas.drawCircle(width / 2, height / 15, width / 35, paint_ball);
-        canvas.drawCircle(game.getBallCenter().x, game.getBallCenter().y,
-                game.getBallRadius(), paint_ball);
+        //canvas.drawCircle(game.getBallCenter().x, game.getBallCenter().y,
+        //        game.getBallRadius(), paint_ball);
+
+        // draw ball
+        if (!game.ballOffScreen()) {
+            canvas.drawCircle(game.getBallCenter().x, game.getBallCenter().y,
+                    game.getBallRadius(), paint_ball);
+        }
 
         // draw paddle
         canvas.drawLine(0 + (3*(width/7)), height - (height / 16),
