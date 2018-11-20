@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Game of Pong Project</string>
+    <string name="default_best_score">0</string>
+    <string name="play_game_btn">Play Pong!</string>
+</resources>

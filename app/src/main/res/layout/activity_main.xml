@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gameBackground"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/best_score"
+        style="@style/TextViewStyle"
+        android:layout_centerHorizontal="true"
+        android:text="@string/default_best_score"/>
+
+    <ImageView
+        android:id="@+id/pong_img"
+        style="@style/ImageStyle"
+        android:layout_below="@+id/best_score"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/pong"/>
+
+    <Button
+        android:id="@+id/play_button"
+        style="@style/ButtonStyle"
+        android:layout_below="@+id/pong_img"
+        android:layout_centerHorizontal="true"
+        android:text="@string/play_game_btn"
+        android:onClick="playGame"/>
+
+</RelativeLayout>
