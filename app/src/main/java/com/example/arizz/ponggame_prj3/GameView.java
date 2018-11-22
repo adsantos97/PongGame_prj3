@@ -11,6 +11,7 @@ public class GameView extends View {
 
     private PongGame game;
 
+    private Rect paddleRect;
     private Paint paint_ball, paint_paddle;
     private int height;
     private int width;
@@ -20,17 +21,25 @@ public class GameView extends View {
         this.width = width;
         this.height = height;
 
-       /*Rect paddleRect = new Rect(0, 0, width/7, height/16);
+        /*Rect paddleRect = new Rect(0, 0, width/7, height/16);
         game = new PongGame(paddleRect, 5, .03f, .2f);
         game.setPaddleSpeed(width * .00003f);
         game.setBallSpeed(width * .0003f);
-        game.setDeltaTime(DELTA_TIME);
+        game.setDeltaTime(DELTA_TIME);*/
 
-        game.setPongRect(new Rect(0, 0, width, height)); */
+        //game.setPongRect(new Rect(0, 0, width, height)); */
 
-        game = new PongGame(5, .2f);
-        game.setBallSpeed(width * .0003f);
+        paddleRect = new Rect(width - (3 * width/7),  height - (2 * height/22),
+                3 * width/7, height - (height/16));
+
+                //new Rect(width - (3 * width/7), height - (height/16),
+               // 3 * width/7, height - (2 * height/22));
+
+        // width
+        game = new PongGame(paddleRect, 20, .4f, (float) 45);
         game.setDeltaTime(DELTA_TIME);
+        game.setBallCenter(width/2, 2*game.getBallRadius());
+        game.setPongRect(new Rect(0, 0, width, height));
 
         // define style and color for ball
         paint_ball = new Paint();
@@ -42,7 +51,7 @@ public class GameView extends View {
         paint_paddle = new Paint();
         paint_paddle.setColor(0xFF4682B4);
         paint_paddle.setAntiAlias(true);
-        paint_paddle.setStrokeWidth(20.0f);
+        paint_paddle.setStrokeWidth(10.0f);
     }
 
     public void onDraw(Canvas canvas) {
@@ -60,12 +69,9 @@ public class GameView extends View {
         }
 
         // draw paddle
-        canvas.drawLine(0 + (3*(width/7)), height - (height / 16),
-                width - (3*(width/7)), height - (height / 16), paint_paddle);
-
-        // draw paddle
-        /*canvas.drawRect(0 + (3*(width/7)), height - (height / 16),
-                width - (3*(width/7)), height - (height / 16), paint_paddle);*/
+        //canvas.drawRect(paddleRect, paint_paddle);
+        canvas.drawRect(game.getPaddleRect().left, game.getPaddleRect().top,
+                game.getPaddleRect().right, game.getPaddleRect().bottom, paint_paddle);
     }
 
     public PongGame getGame() {

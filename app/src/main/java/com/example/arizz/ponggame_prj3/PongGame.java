@@ -2,27 +2,30 @@ package com.example.arizz.ponggame_prj3;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class PongGame {
+    public final static String MA = "MainActivity";
+
     private static final String PREFERENCE_HITS = "highestHits";
 
     private Rect pongRect;
     private int deltaTime; // in milliseconds
 
     private Rect paddleRect;
-    private Point paddleCenter;
     private int paddleWidth;
     private int paddleHeight;
-    private float paddleSpeed;
+    private Point paddleCenter;
     private boolean paddleHit;
 
     private Point ballCenter;
     private int ballRadius;
     private float ballAngle;
-    private float ballSpeed;
+    private float ballSpeedX;
+    private float ballSpeedY;
     private boolean ballDropped;
 
-    private int numberHits;
+    private int numberHits = 0;
 
     /*public PongGame(Context context) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -39,12 +42,16 @@ public class PongGame {
         paddleHit = false;
     }*/
 
-    public PongGame(int newBallRadius, float newBallSpeed) {
+    public PongGame(Rect newPaddleRect, int newBallRadius, float newBallSpeed,
+                    float ballAngle) {
+        setPaddleRect(newPaddleRect);
         setBallRadius(newBallRadius);
         setBallSpeed(newBallSpeed);
+        setBallAngle(ballAngle);
         ballDropped = false;
     }
 
+    // call setPreferences when game ends
     /*public void setPreferenceHits(Context context) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = pref.edit();
@@ -87,19 +94,34 @@ public class PongGame {
             paddleWidth = newPaddleRect.right - newPaddleRect.left;
             paddleHeight = newPaddleRect.bottom - newPaddleRect.top;
             paddleRect = newPaddleRect;
-            paddleCenter.x = paddleWidth / 2;
-            paddleCenter.y = paddleHeight / 2;
         }
     }
 
-    public void setPaddleSpeed(float newPaddleSpeed) {
-        if(newPaddleSpeed > 0) {
-            paddleSpeed = newPaddleSpeed;
+    public void setPaddlePosition(int left, int right) {
+        if (right >= pongRect.right) {
+            /*Log.w(MA, "in if in PongGame");
+            Log.w(MA, "paddle right: " + paddleRect.right);
+            Log.w(MA, "right: " + right);*/
+            paddleRect.right = pongRect.right;
+            //Log.w(MA, "pong right: " + pongRect.right);
+            //Log.w(MA, "right: " + paddleRect.right);
+            paddleRect.left = paddleRect.right + paddleWidth;
+            /*Log.w(MA, "paddlewidth: " + paddleWidth);
+            Log.w(MA, "left pos in first: " + left);
+            Log.w(MA, "right in first: " + paddleRect.right);
+            Log.w(MA, "left in first: " + paddleRect.left);*/
         }
-    }
+        else if (left <= pongRect.left) {
+            paddleRect.left = pongRect.left;
+            paddleRect.right = pongRect.left - paddleWidth;
+        }
+        else {
+            //Log.w(MA, "--------------");
+            paddleRect.left = left;
+            paddleRect.right = right;
+            //Log.w(MA, "end--------------");
+        }
 
-    public Point getPaddleCenter() {
-        return paddleCenter;
     }
 
     public int getPaddleWidth() {
@@ -109,15 +131,6 @@ public class PongGame {
     public int getPaddleHeight() {
         return paddleHeight;
     }
-
-    /*public void setPaddle(Point newPaddleCenter, int newPaddleRadius,
-                          int newPaddleLength) {
-        if(newPaddleCenter != null && newPaddleLength > 0) {
-            paddleCenter = newPaddleCenter;
-            paddleWidth = newPaddleLength;
-            paddleRadius = newPaddleRadius;
-        }
-    }*/
 
     public Point getBallCenter() {
         return ballCenter;
@@ -133,21 +146,51 @@ public class PongGame {
         }
     }
 
+    public void setBallCenter(int x, int y){
+        ballCenter = new Point(x, y);
+    }
+
     public void setBallSpeed(float newBallSpeed) {
-        if(newBallSpeed > 0) {
-            ballSpeed = newBallSpeed;
-        }
+        //if(newBallSpeed > 0) {
+            ballSpeedX = newBallSpeed;
+            ballSpeedY = newBallSpeed;
+        //}
+    }
+
+    public void setBallAngle(float newBallAngle) {
+        ballAngle = newBallAngle;
     }
 
     public void moveBall() {
-        ballCenter.x += ballSpeed * Math.cos(ballAngle) * deltaTime;
-        ballCenter.y -= ballSpeed * Math.sin(ballAngle) * deltaTime;
+        // checking the top and bottom
+        if (ballCenter.y + ballSpeedY > pongRect.bottom ||
+                ballCenter.y + ballSpeedY < pongRect.top) {
+            //Log.w(MA, "In moveBall in first if");
+            ballSpeedY = -ballSpeedY;
+        }
+
+        // checking the right and left
+        if (ballCenter.x + ballSpeedX > pongRect.right ||
+                ballCenter.x + ballSpeedX < pongRect.left) {
+            //Log.w(MA, "In moveBall in second if");
+            ballSpeedX = -ballSpeedX;
+        }
+
+        ballCenter.x += ballSpeedX * Math.cos(ballAngle) * deltaTime;
+        ballCenter.y += ballSpeedY * Math.sin(ballAngle) * deltaTime;
+        /*Log.w(MA, "ballCenter.x + paddleWidth: " + (ballCenter.x + ballRadius));
+        Log.w(MA, "ballCenter.y + paddleWidth: " + (ballCenter.y + ballRadius));
+        Log.w(MA, "ballCenter.x - paddleWidth: " + (ballCenter.x - ballRadius));
+        Log.w(MA, "ballCenter.y - paddleWidth: " + (ballCenter.y - ballRadius));
+        Log.w(MA, "paddleRect.left: " + paddleRect.left);
+        Log.w(MA, "paddleRect.top: " + paddleRect.top);
+        Log.w(MA, "paddleRect.right: " + paddleRect.right);
+        Log.w(MA, "paddleRect.bottom: " + paddleRect.bottom);
+        Log.w(MA, "height: " + paddleHeight);*/
     }
 
     public void loadBall() {
         ballDropped = false;
-        ballCenter.x = 0;
-        ballCenter.y = 0;
     }
 
     /**
@@ -156,9 +199,9 @@ public class PongGame {
      * @return true if the balls hits a side
      */
     public boolean ballHitSide() {
-        return ballCenter.x + ballRadius == pongRect.right // right
-                || ballCenter.x - ballRadius == pongRect.left // left
-                || ballCenter.y - ballRadius == 0; // top
+        return (ballCenter.x + ballRadius) == pongRect.right // right >
+                || (ballCenter.x - ballRadius) == pongRect.left // left <
+                || (ballCenter.y - ballRadius) == pongRect.top; // top <
     }
 
     /**
@@ -180,25 +223,33 @@ public class PongGame {
     /**
      * "Drops" ball
      */
-    public void dropBall(float newBallAngle) {
+    public void dropBall() {
         ballDropped = true;
-        if(newBallAngle >= 0 && newBallAngle <= Math.PI / 2) {
-            ballAngle = newBallAngle;
-        }
-        else if(newBallAngle < 0) {
-            ballAngle = 0;
-        }
-        else {
-            ballAngle = (float) Math.PI / 2;
-        }
     }
+
 
     public boolean isPaddleHit() {
         return paddleHit;
     }
 
-    public void setPaddleHit(boolean newPaddleHit) {
-        paddleHit = newPaddleHit;
+    public void setPaddleHit(boolean newDuckShot) {
+        paddleHit = newDuckShot;
+    }
+
+    public float getBallSpeedX() {
+        return ballSpeedX;
+    }
+
+    public float getBallSpeedY() {
+        return ballSpeedY;
+    }
+
+    public void setBallSpeedX(float newBallSpeedX) {
+        ballSpeedX = newBallSpeedX;
+    }
+
+    public void setBallSpeedY(float newBallSpeedY) {
+        ballSpeedY = newBallSpeedY;
     }
 
     /**
@@ -208,6 +259,16 @@ public class PongGame {
     public boolean paddleTouch() {
         return paddleRect.intersects(
                 ballCenter.x - ballRadius, ballCenter.y - ballRadius,
-                ballCenter.x + ballRadius, ballCenter.y - ballRadius);
+                ballCenter.x + ballRadius, ballCenter.y + ballRadius);
+                //ballCenter.x == paddleRect.top && ballCenter.y == paddleRect.top;
+
+                /*paddleRect.intersects(
+                ballCenter.x , ballCenter.y,
+                ballCenter.x, ballCenter.y);*/
+
+                //(ballCenter.y + ballRadius) >= paddleRect.top;
+        /*paddleRect.intersects(
+                ballCenter.x - ballRadius, ballCenter.y - ballRadius,
+                ballCenter.x + ballRadius, ballCenter.y + ballRadius);*/
     }
 }
