@@ -5,10 +5,13 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.util.Timer;
 
@@ -18,6 +21,9 @@ public class GameActivity extends Activity {
     private GameView gameView;
     private GestureDetector detector;
     private PongGame game;
+
+    private SoundPool pool;
+    private int hitSoundID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +51,16 @@ public class GameActivity extends Activity {
         detector = new GestureDetector(this, th);
         detector.setOnDoubleTapListener(th);
 
+        SoundPool.Builder poolBuilder = new SoundPool.Builder();
+        poolBuilder.setMaxStreams(1);
+        pool = poolBuilder.build();
+        hitSoundID = pool.load(this, R.raw.paddle_hit, 1);
         // write data in PongGame to user preferences
         //game.setPreferenceHits(this);
+    }
+
+    public void playHitSound() {
+        pool.play(hitSoundID, 1.0f, 1.0f, 1, 0, 1.0f);
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -56,15 +70,21 @@ public class GameActivity extends Activity {
 
     private class TouchHandler extends GestureDetector.SimpleOnGestureListener {
         public boolean onSingleTapConfirmed(MotionEvent event) {
+            if(game.ballOffScreen()) {
+                game.setHits(0);
+                game.loadBall();
+            }
             if(!game.isBallDropped()) {
                 game.dropBall();
-                game.moveBall();
             }
             return true;
         }
 
         public boolean onScroll(MotionEvent event1, MotionEvent event2,
                                 float d1, float d2) {
+            if(!game.isBallDropped()) {
+                game.dropBall();
+            }
             updatePaddle(event2);
             return true;
         }
@@ -73,30 +93,7 @@ public class GameActivity extends Activity {
             int right = (int)event.getX() + (game.getPaddleWidth()/2);
             int left = right - game.getPaddleWidth();
 
-            /*Log.w(MA, "getX: " + event.getX());
-            Log.w(MA, "paddle center: " + game.getPaddleWidth());
-            Log.w(MA, "left: " + left);
-            Log.w(MA, "paddle left: " + game.getPaddleRect().left);
-            Log.w(MA, "left pong: " + game.getPongRect().left);
-            Log.w(MA, "right: " + right);
-            Log.w(MA, "paddle right: " + game.getPaddleRect().right);
-            Log.w(MA, "right pong: " + game.getPongRect().right);*/
-
-            //Log.w(MA, "paddle left: " + game.getPaddleRect().left);
-            //Log.w(MA, "paddle right: " + game.getPaddleRect().right);
             game.setPaddlePosition(right, left);
-            /*
-            if(right <= game.getPongRect().left) {
-                Log.w(MA, "in first if");
-                game.setPaddleRect(new Rect(game.getPongRect().left, game.getPaddleRect().top,
-                        game.getPaddleWidth(), game.getPaddleRect().bottom));
-            }
-            else {
-                Log.w(MA, "in else");
-                game.setPaddleRect(new Rect(left, game.getPaddleRect().top,
-                        right, game.getPaddleRect().bottom));
-            }
-            */
         }
     }
 }
